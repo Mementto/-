@@ -7,10 +7,6 @@ import java.util.List;
 
 public class TrackUtil {
 
-    public static boolean isSameFace(FaceInfo faceInfo1,FaceInfo faceInfo2) {
-        return faceInfo1.getFaceId() == faceInfo2.getFaceId();
-    }
-
     public static void keepMaxFace(List<FaceInfo> ftFaceList) {
         if (ftFaceList == null || ftFaceList.size() <= 1) {
             return;

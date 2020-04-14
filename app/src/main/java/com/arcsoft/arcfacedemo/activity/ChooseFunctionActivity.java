@@ -9,7 +9,6 @@ import android.view.View;
 
 import com.arcsoft.arcfacedemo.R;
 import com.arcsoft.arcfacedemo.common.Constants;
-import com.arcsoft.arcfacedemo.fragment.ChooseDetectDegreeDialog;
 import com.arcsoft.face.ActiveFileInfo;
 import com.arcsoft.face.ErrorInfo;
 import com.arcsoft.face.FaceEngine;
@@ -47,7 +46,6 @@ public class ChooseFunctionActivity extends BaseActivity {
             "libarcsoft_image_util.so",
     };
     // 修改配置项的对话框
-    ChooseDetectDegreeDialog chooseDetectDegreeDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,33 +87,6 @@ public class ChooseFunctionActivity extends BaseActivity {
     }
 
     /**
-     * 打开相机，显示年龄性别
-     *
-     * @param view
-     */
-    public void jumpToPreviewActivity(View view) {
-        checkLibraryAndJump(FaceAttrPreviewActivity.class);
-    }
-
-    /**
-     * 处理单张图片，显示图片中所有人脸的信息，并且一一比对相似度
-     *
-     * @param view
-     */
-    public void jumpToSingleImageActivity(View view) {
-        checkLibraryAndJump(SingleImageActivity.class);
-    }
-
-    /**
-     * 选择一张主照，显示主照中人脸的详细信息，然后选择图片和主照进行比对
-     *
-     * @param view
-     */
-    public void jumpToMultiImageActivity(View view) {
-        checkLibraryAndJump(MultiImageActivity.class);
-    }
-
-    /**
      * 打开相机，RGB活体检测，人脸注册，人脸识别
      *
      * @param view
@@ -123,25 +94,6 @@ public class ChooseFunctionActivity extends BaseActivity {
     public void jumpToFaceRecognizeActivity(View view) {
         checkLibraryAndJump(RegisterAndRecognizeActivity.class);
     }
-
-    /**
-     * 打开相机，IR活体检测，人脸注册，人脸识别
-     *
-     * @param view
-     */
-    public void jumpToIrFaceRecognizeActivity(View view) {
-        checkLibraryAndJump(IrRegisterAndRecognizeActivity.class);
-    }
-
-    /**
-     * 批量注册和删除功能
-     *
-     * @param view
-     */
-    public void jumpToBatchRegisterActivity(View view) {
-        checkLibraryAndJump(FaceManageActivity.class);
-    }
-
     /**
      * 激活引擎
      *
@@ -235,15 +187,5 @@ public class ChooseFunctionActivity extends BaseActivity {
         startActivity(new Intent(this, activityClass));
     }
 
-
-    public void chooseDetectDegree(View view) {
-        if (chooseDetectDegreeDialog == null) {
-            chooseDetectDegreeDialog = new ChooseDetectDegreeDialog();
-        }
-        if (chooseDetectDegreeDialog.isAdded()) {
-            chooseDetectDegreeDialog.dismiss();
-        }
-        chooseDetectDegreeDialog.show(getSupportFragmentManager(), ChooseDetectDegreeDialog.class.getSimpleName());
-    }
 
 }

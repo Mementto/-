@@ -177,12 +177,6 @@ public class CameraHelper implements Camera.PreviewCallback {
         }
     }
 
-    public boolean isStopped() {
-        synchronized (this) {
-            return mCamera == null;
-        }
-    }
-
     public void release() {
         synchronized (this) {
             stop();
@@ -244,19 +238,6 @@ public class CameraHelper implements Camera.PreviewCallback {
         return bestSize;
     }
 
-    public List<Camera.Size> getSupportedPreviewSizes() {
-        if (mCamera == null) {
-            return null;
-        }
-        return mCamera.getParameters().getSupportedPreviewSizes();
-    }
-
-    public List<Camera.Size> getSupportedPictureSizes() {
-        if (mCamera == null) {
-            return null;
-        }
-        return mCamera.getParameters().getSupportedPictureSizes();
-    }
 
 
     @Override
@@ -319,16 +300,7 @@ public class CameraHelper implements Camera.PreviewCallback {
         }
     };
 
-    public void changeDisplayOrientation(int rotation) {
-        if (mCamera != null) {
-            this.rotation = rotation;
-            displayOrientation = getCameraOri(rotation);
-            mCamera.setDisplayOrientation(displayOrientation);
-            if (cameraListener != null) {
-                cameraListener.onCameraConfigurationChanged(mCameraId, displayOrientation);
-            }
-        }
-    }
+
     public boolean switchCamera() {
         if (Camera.getNumberOfCameras() < 2) {
             return false;
@@ -396,10 +368,6 @@ public class CameraHelper implements Camera.PreviewCallback {
             return this;
         }
 
-        public Builder previewSize(Point val) {
-            previewSize = val;
-            return this;
-        }
 
         public Builder previewViewSize(Point val) {
             previewViewSize = val;
@@ -411,10 +379,6 @@ public class CameraHelper implements Camera.PreviewCallback {
             return this;
         }
 
-        public Builder additionalRotation(int val) {
-            additionalRotation = val;
-            return this;
-        }
 
         public Builder specificCameraId(Integer val) {
             specificCameraId = val;

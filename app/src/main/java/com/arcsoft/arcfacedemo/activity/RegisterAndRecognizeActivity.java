@@ -11,8 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 
 import com.arcsoft.arcfacedemo.R;
 import com.arcsoft.arcfacedemo.faceserver.CompareResult;
@@ -30,14 +28,12 @@ import com.arcsoft.arcfacedemo.util.face.RecognizeColor;
 import com.arcsoft.arcfacedemo.util.face.RequestFeatureStatus;
 import com.arcsoft.arcfacedemo.util.face.RequestLivenessStatus;
 import com.arcsoft.arcfacedemo.widget.FaceRectView;
-import com.arcsoft.arcfacedemo.widget.FaceSearchResultAdapter;
 import com.arcsoft.face.AgeInfo;
 import com.arcsoft.face.ErrorInfo;
 import com.arcsoft.face.FaceEngine;
 import com.arcsoft.face.FaceFeature;
 import com.arcsoft.face.GenderInfo;
 import com.arcsoft.face.LivenessInfo;
-import com.arcsoft.face.VersionInfo;
 import com.arcsoft.face.enums.DetectFaceOrientPriority;
 import com.arcsoft.face.enums.DetectMode;
 
@@ -50,9 +46,6 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -104,25 +97,10 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
     private int flInitCode = -1;
     private FaceHelper faceHelper;
     private List<CompareResult> compareResultList;
-    private FaceSearchResultAdapter adapter;
     /**
      * 活体检测的开关
      */
     private boolean livenessDetect = true;
-    /**
-     * 注册人脸状态码，准备注册
-     */
-    private static final int REGISTER_STATUS_READY = 0;
-    /**
-     * 注册人脸状态码，注册中
-     */
-    private static final int REGISTER_STATUS_PROCESSING = 1;
-    /**
-     * 注册人脸状态码，注册结束（无论成功失败）
-     */
-    private static final int REGISTER_STATUS_DONE = 2;
-
-    private int registerStatus = REGISTER_STATUS_DONE;
     /**
      * 用于记录人脸识别相关状态
      */
@@ -150,8 +128,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
      * 绘制人脸框的控件
      */
     private FaceRectView faceRectView;
-
-    private Switch switchLivenessDetect;
 
     private static final int ACTION_REQUEST_PERMISSIONS = 0x001;
     /**
@@ -194,22 +170,8 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
         previewView.getViewTreeObserver().addOnGlobalLayoutListener(this);
 
         faceRectView = findViewById(R.id.single_camera_face_rect_view);
-        switchLivenessDetect = findViewById(R.id.single_camera_switch_liveness_detect);
-        switchLivenessDetect.setChecked(livenessDetect);
-        switchLivenessDetect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                livenessDetect = isChecked;
-            }
-        });
-        RecyclerView recyclerShowFaceInfo = findViewById(R.id.single_camera_recycler_view_person);
         compareResultList = new ArrayList<>();
-        adapter = new FaceSearchResultAdapter(compareResultList, this);
-        recyclerShowFaceInfo.setAdapter(adapter);
         DisplayMetrics dm = getResources().getDisplayMetrics();
-        int spanCount = (int) (dm.widthPixels / (getResources().getDisplayMetrics().density * 100 + 0.5f));
-        recyclerShowFaceInfo.setLayoutManager(new GridLayoutManager(this, spanCount));
-        recyclerShowFaceInfo.setItemAnimator(new DefaultItemAnimator());
     }
 
     /**
@@ -321,6 +283,7 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                     //活体检测通过，搜索特征
                     else if (liveness != null && liveness == LivenessInfo.ALIVE) {
                         searchFace(faceFeature, requestId);
+//                        showToast("可上传");
                     }
                     //活体检测未出结果，或者非活体，延迟执行该函数
                     else {
@@ -450,8 +413,8 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                 if (facePreviewInfoList != null && faceRectView != null && drawHelper != null) {
                     drawPreviewInfo(facePreviewInfoList);
                 }
-                registerFace(nv21, facePreviewInfoList);
                 clearLeftFace(facePreviewInfoList);
+
 
                 if (facePreviewInfoList != null && facePreviewInfoList.size() > 0 && previewSize != null) {
                     for (int i = 0; i < facePreviewInfoList.size(); i++) {
@@ -512,64 +475,16 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
         cameraHelper.start();
     }
 
-    private void registerFace(final byte[] nv21, final List<FacePreviewInfo> facePreviewInfoList) {
-        if (registerStatus == REGISTER_STATUS_READY && facePreviewInfoList != null && facePreviewInfoList.size() > 0) {
-            registerStatus = REGISTER_STATUS_PROCESSING;
-            Observable.create(new ObservableOnSubscribe<Boolean>() {
-                @Override
-                public void subscribe(ObservableEmitter<Boolean> emitter) {
-
-                    boolean success = FaceServer.getInstance().registerNv21(RegisterAndRecognizeActivity.this, nv21.clone(), previewSize.width, previewSize.height,
-                            facePreviewInfoList.get(0).getFaceInfo(), "registered " + faceHelper.getTrackedFaceCount());
-                    emitter.onNext(success);
-                }
-            })
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<Boolean>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onNext(Boolean success) {
-                            String result = success ? "register success!" : "register failed!";
-                            showToast(result);
-                            registerStatus = REGISTER_STATUS_DONE;
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            e.printStackTrace();
-                            showToast("register failed!");
-                            registerStatus = REGISTER_STATUS_DONE;
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
-        }
-    }
-
     private void drawPreviewInfo(List<FacePreviewInfo> facePreviewInfoList) {
         List<DrawInfo> drawInfoList = new ArrayList<>();
         for (int i = 0; i < facePreviewInfoList.size(); i++) {
             String name = faceHelper.getName(facePreviewInfoList.get(i).getTrackId());
             Integer liveness = livenessMap.get(facePreviewInfoList.get(i).getTrackId());
-            Integer recognizeStatus = requestFeatureStatusMap.get(facePreviewInfoList.get(i).getTrackId());
 
             // 根据识别结果和活体结果设置颜色
             int color = RecognizeColor.COLOR_UNKNOWN;
-            if (recognizeStatus != null) {
-                if (recognizeStatus == RequestFeatureStatus.FAILED) {
-                    color = RecognizeColor.COLOR_FAILED;
-                }
-                if (recognizeStatus == RequestFeatureStatus.SUCCEED) {
-                    color = RecognizeColor.COLOR_SUCCESS;
-                }
+            if (liveness != null && liveness == LivenessInfo.ALIVE) {
+                color = RecognizeColor.COLOR_SUCCESS;
             }
             if (liveness != null && liveness == LivenessInfo.NOT_ALIVE) {
                 color = RecognizeColor.COLOR_FAILED;
@@ -604,7 +519,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
             for (int i = compareResultList.size() - 1; i >= 0; i--) {
                 if (!requestFeatureStatusMap.containsKey(compareResultList.get(i).getTrackId())) {
                     compareResultList.remove(i);
-                    adapter.notifyItemRemoved(i);
                 }
             }
         }
@@ -685,12 +599,10 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                                 //对于多人脸搜索，假如最大显示数量为 MAX_DETECT_NUM 且有新的人脸进入，则以队列的形式移除
                                 if (compareResultList.size() >= MAX_DETECT_NUM) {
                                     compareResultList.remove(0);
-                                    adapter.notifyItemRemoved(0);
                                 }
                                 //添加显示人员时，保存其trackId
                                 compareResult.setTrackId(requestId);
                                 compareResultList.add(compareResult);
-                                adapter.notifyItemInserted(compareResultList.size() - 1);
                             }
                             requestFeatureStatusMap.put(requestId, RequestFeatureStatus.SUCCEED);
                             faceHelper.setName(requestId, getString(R.string.recognize_success_notice, compareResult.getUserName()));
@@ -712,34 +624,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
 
                     }
                 });
-    }
-
-
-    /**
-     * 将准备注册的状态置为{@link #REGISTER_STATUS_READY}
-     *
-     * @param view 注册按钮
-     */
-    public void register(View view) {
-        if (registerStatus == REGISTER_STATUS_DONE) {
-            registerStatus = REGISTER_STATUS_READY;
-        }
-    }
-
-    /**
-     * 切换相机。注意：若切换相机发现检测不到人脸，则极有可能是检测角度导致的，需要销毁引擎重新创建或者在设置界面修改配置的检测角度
-     *
-     * @param view
-     */
-    public void switchCamera(View view) {
-        if (cameraHelper != null) {
-            boolean success = cameraHelper.switchCamera();
-            if (!success) {
-                showToast(getString(R.string.switch_camera_failed));
-            } else {
-                showLongToast(getString(R.string.notice_change_detect_degree));
-            }
-        }
     }
 
     /**

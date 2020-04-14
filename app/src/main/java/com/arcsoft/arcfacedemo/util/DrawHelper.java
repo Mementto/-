@@ -207,95 +207,27 @@ public class DrawHelper {
         mPath.lineTo(rect.left, rect.bottom - rect.height() / 4);
         canvas.drawPath(mPath, paint);
 
-        // 绘制文字，用最细的即可，避免在某些低像素设备上文字模糊
-        paint.setStrokeWidth(1);
-
-        if (drawInfo.getName() == null) {
-            paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            paint.setTextSize(rect.width() / 8);
-
-            String str = (drawInfo.getSex() == GenderInfo.MALE ? "MALE" : (drawInfo.getSex() == GenderInfo.FEMALE ? "FEMALE" : "UNKNOWN"))
-                    + ","
-                    + (drawInfo.getAge() == AgeInfo.UNKNOWN_AGE ? "UNKNOWN" : drawInfo.getAge())
-                    + ","
-                    + (drawInfo.getLiveness() == LivenessInfo.ALIVE ? "ALIVE" : (drawInfo.getLiveness() == LivenessInfo.NOT_ALIVE ? "NOT_ALIVE" : "UNKNOWN"));
-            canvas.drawText(str, rect.left, rect.top - 10, paint);
-        } else {
-            paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            paint.setTextSize(rect.width() / 8);
-            canvas.drawText(drawInfo.getName(), rect.left, rect.top - 10, paint);
-        }
-    }
-
-    public void setPreviewWidth(int previewWidth) {
-        this.previewWidth = previewWidth;
-    }
-
-    public void setPreviewHeight(int previewHeight) {
-        this.previewHeight = previewHeight;
-    }
-
-    public void setCanvasWidth(int canvasWidth) {
-        this.canvasWidth = canvasWidth;
-    }
-
-    public void setCanvasHeight(int canvasHeight) {
-        this.canvasHeight = canvasHeight;
+//        // 绘制文字，用最细的即可，避免在某些低像素设备上文字模糊
+//        paint.setStrokeWidth(1);
+//
+//        if (drawInfo.getName() == null) {
+//            paint.setStyle(Paint.Style.FILL_AND_STROKE);
+//            paint.setTextSize(rect.width() / 8);
+//
+//            String str = (drawInfo.getSex() == GenderInfo.MALE ? "MALE" : (drawInfo.getSex() == GenderInfo.FEMALE ? "FEMALE" : "UNKNOWN"))
+//                    + ","
+//                    + (drawInfo.getAge() == AgeInfo.UNKNOWN_AGE ? "UNKNOWN" : drawInfo.getAge())
+//                    + ","
+//                    + (drawInfo.getLiveness() == LivenessInfo.ALIVE ? "ALIVE" : (drawInfo.getLiveness() == LivenessInfo.NOT_ALIVE ? "NOT_ALIVE" : "UNKNOWN"));
+//            canvas.drawText(str, rect.left, rect.top - 10, paint);
+//        } else {
+//            paint.setStyle(Paint.Style.FILL_AND_STROKE);
+//            paint.setTextSize(rect.width() / 8);
+//            canvas.drawText(drawInfo.getName(), rect.left, rect.top - 10, paint);
+//        }
     }
 
     public void setCameraDisplayOrientation(int cameraDisplayOrientation) {
         this.cameraDisplayOrientation = cameraDisplayOrientation;
-    }
-
-    public void setCameraId(int cameraId) {
-        this.cameraId = cameraId;
-    }
-
-    public void setMirror(boolean mirror) {
-        isMirror = mirror;
-    }
-
-    public int getPreviewWidth() {
-        return previewWidth;
-    }
-
-    public int getPreviewHeight() {
-        return previewHeight;
-    }
-
-    public int getCanvasWidth() {
-        return canvasWidth;
-    }
-
-    public int getCanvasHeight() {
-        return canvasHeight;
-    }
-
-    public int getCameraDisplayOrientation() {
-        return cameraDisplayOrientation;
-    }
-
-    public int getCameraId() {
-        return cameraId;
-    }
-
-    public boolean isMirror() {
-        return isMirror;
-    }
-
-    public boolean isMirrorHorizontal() {
-        return mirrorHorizontal;
-    }
-
-    public void setMirrorHorizontal(boolean mirrorHorizontal) {
-        this.mirrorHorizontal = mirrorHorizontal;
-    }
-
-    public boolean isMirrorVertical() {
-        return mirrorVertical;
-    }
-
-    public void setMirrorVertical(boolean mirrorVertical) {
-        this.mirrorVertical = mirrorVertical;
     }
 }

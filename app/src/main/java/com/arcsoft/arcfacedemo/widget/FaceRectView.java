@@ -50,11 +50,6 @@ public class FaceRectView extends View {
         postInvalidate();
     }
 
-    public void addFaceInfo(DrawInfo faceInfo) {
-        drawInfoList.add(faceInfo);
-        postInvalidate();
-    }
-
     public void addFaceInfo(List<DrawInfo> faceInfoList) {
         drawInfoList.addAll(faceInfoList);
         postInvalidate();
