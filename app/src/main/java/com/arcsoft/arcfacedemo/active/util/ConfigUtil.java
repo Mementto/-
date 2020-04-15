@@ -1,11 +1,9 @@
-package com.arcsoft.arcfacedemo.util;
+package com.arcsoft.arcfacedemo.active.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.arcsoft.face.FaceEngine;
 import com.arcsoft.face.enums.DetectFaceOrientPriority;
-import com.arcsoft.face.enums.DetectMode;
 
 public class ConfigUtil {
     private static final String APP_NAME = "ArcFaceDemo";
@@ -31,15 +29,6 @@ public class ConfigUtil {
         return sharedPreferences.getInt(TRACKED_FACE_COUNT, 0);
     }
 
-    public static boolean setFtOrient(Context context, DetectFaceOrientPriority ftOrient) {
-        if (context == null) {
-            return false;
-        }
-        SharedPreferences sharedPreferences = context.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.edit()
-                .putString(FT_ORIENT, ftOrient.name())
-                .commit();
-    }
 
     public static DetectFaceOrientPriority getFtOrient(Context context) {
         if (context == null) {

@@ -48,8 +48,5 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void showToast(String s) {
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
     }
-    protected void showLongToast(String s) {
-        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
-    }
 
 }

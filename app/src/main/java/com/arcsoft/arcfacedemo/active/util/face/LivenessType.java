@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.util.face;
+package com.arcsoft.arcfacedemo.active.util.face;
 
 /**
  * 活体检测类型

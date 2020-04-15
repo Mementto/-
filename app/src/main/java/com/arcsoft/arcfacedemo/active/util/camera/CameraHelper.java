@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.util.camera;
+package com.arcsoft.arcfacedemo.active.util.camera;
 
 import android.graphics.ImageFormat;
 import android.graphics.Point;
@@ -299,18 +299,6 @@ public class CameraHelper implements Camera.PreviewCallback {
             stop();
         }
     };
-
-
-    public boolean switchCamera() {
-        if (Camera.getNumberOfCameras() < 2) {
-            return false;
-        }
-        // cameraId ,0为后置，1为前置
-        specificCameraId = 1 - mCameraId;
-        stop();
-        start();
-        return true;
-    }
 
     public static final class Builder {
 

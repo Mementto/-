@@ -1,11 +1,15 @@
 package com.arcsoft.arcfacedemo.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -13,29 +17,31 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 import com.arcsoft.arcfacedemo.R;
-import com.arcsoft.arcfacedemo.faceserver.CompareResult;
-import com.arcsoft.arcfacedemo.faceserver.FaceServer;
-import com.arcsoft.arcfacedemo.model.DrawInfo;
-import com.arcsoft.arcfacedemo.model.FacePreviewInfo;
-import com.arcsoft.arcfacedemo.util.ConfigUtil;
-import com.arcsoft.arcfacedemo.util.DrawHelper;
-import com.arcsoft.arcfacedemo.util.camera.CameraHelper;
-import com.arcsoft.arcfacedemo.util.camera.CameraListener;
-import com.arcsoft.arcfacedemo.util.face.FaceHelper;
-import com.arcsoft.arcfacedemo.util.face.FaceListener;
-import com.arcsoft.arcfacedemo.util.face.LivenessType;
-import com.arcsoft.arcfacedemo.util.face.RecognizeColor;
-import com.arcsoft.arcfacedemo.util.face.RequestFeatureStatus;
-import com.arcsoft.arcfacedemo.util.face.RequestLivenessStatus;
-import com.arcsoft.arcfacedemo.widget.FaceRectView;
+import com.arcsoft.arcfacedemo.active.faceserver.CompareResult;
+import com.arcsoft.arcfacedemo.active.faceserver.FaceServer;
+import com.arcsoft.arcfacedemo.active.model.DrawInfo;
+import com.arcsoft.arcfacedemo.active.model.FacePreviewInfo;
+import com.arcsoft.arcfacedemo.active.util.ConfigUtil;
+import com.arcsoft.arcfacedemo.active.util.DrawHelper;
+import com.arcsoft.arcfacedemo.active.util.camera.CameraHelper;
+import com.arcsoft.arcfacedemo.active.util.camera.CameraListener;
+import com.arcsoft.arcfacedemo.active.util.face.FaceHelper;
+import com.arcsoft.arcfacedemo.active.util.face.FaceListener;
+import com.arcsoft.arcfacedemo.active.util.face.LivenessType;
+import com.arcsoft.arcfacedemo.active.util.face.RecognizeColor;
+import com.arcsoft.arcfacedemo.active.util.face.RequestFeatureStatus;
+import com.arcsoft.arcfacedemo.active.util.face.RequestLivenessStatus;
+import com.arcsoft.arcfacedemo.active.widget.FaceRectView;
 import com.arcsoft.face.AgeInfo;
 import com.arcsoft.face.ErrorInfo;
 import com.arcsoft.face.FaceEngine;
 import com.arcsoft.face.FaceFeature;
+import com.arcsoft.face.FaceInfo;
 import com.arcsoft.face.GenderInfo;
 import com.arcsoft.face.LivenessInfo;
 import com.arcsoft.face.enums.DetectFaceOrientPriority;
 import com.arcsoft.face.enums.DetectMode;
+import com.arcsoft.imageutil.ArcSoftImageFormat;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -47,21 +53,13 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTreeObserver.OnGlobalLayoutListener {
     private static final String TAG = "RegisterAndRecognize";
     private static final int MAX_DETECT_NUM = 10;
-    /**
-     * 当FR成功，活体未成功时，FR等待活体的时间
-     */
-    private static final int WAIT_LIVENESS_INTERVAL = 100;
     /**
      * 失败重试间隔时间（ms）
      */
@@ -128,20 +126,17 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
      * 绘制人脸框的控件
      */
     private FaceRectView faceRectView;
-
-    private static final int ACTION_REQUEST_PERMISSIONS = 0x001;
-    /**
-     * 识别阈值
-     */
-    private static final float SIMILAR_THRESHOLD = 0.8F;
     /**
      * 所需的所有权限信息
      */
     private static final String[] NEEDED_PERMISSIONS = new String[]{
             Manifest.permission.CAMERA,
             Manifest.permission.READ_PHONE_STATE
-
     };
+
+    private static final int ACTION_REQUEST_PERMISSIONS = 0x001;
+
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,7 +144,7 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
         setContentView(R.layout.activity_register_and_recognize);
         //保持亮屏
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+        count = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WindowManager.LayoutParams attributes = getWindow().getAttributes();
             attributes.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
@@ -158,8 +153,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
 
         // Activity启动后就锁定为启动时的方向
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-        //本地人脸库初始化
-        FaceServer.getInstance().init(this);
 
         initView();
     }
@@ -254,8 +247,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
             faceHelper.release();
             faceHelper = null;
         }
-
-        FaceServer.getInstance().unInit();
         super.onDestroy();
     }
 
@@ -269,78 +260,8 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                 Log.e(TAG, "onFail: " + e.getMessage());
             }
 
-            //请求FR的回调
             @Override
-            public void onFaceFeatureInfoGet(@Nullable final FaceFeature faceFeature, final Integer requestId, final Integer errorCode) {
-                //FR成功
-                if (faceFeature != null) {
-//                    Log.i(TAG, "onPreview: fr end = " + System.currentTimeMillis() + " trackId = " + requestId);
-                    Integer liveness = livenessMap.get(requestId);
-                    //不做活体检测的情况，直接搜索
-                    if (!livenessDetect) {
-                        searchFace(faceFeature, requestId);
-                    }
-                    //活体检测通过，搜索特征
-                    else if (liveness != null && liveness == LivenessInfo.ALIVE) {
-                        searchFace(faceFeature, requestId);
-//                        showToast("可上传");
-                    }
-                    //活体检测未出结果，或者非活体，延迟执行该函数
-                    else {
-                        if (requestFeatureStatusMap.containsKey(requestId)) {
-                            Observable.timer(WAIT_LIVENESS_INTERVAL, TimeUnit.MILLISECONDS)
-                                    .subscribe(new Observer<Long>() {
-                                        Disposable disposable;
-
-                                        @Override
-                                        public void onSubscribe(Disposable d) {
-                                            disposable = d;
-                                            getFeatureDelayedDisposables.add(disposable);
-                                        }
-
-                                        @Override
-                                        public void onNext(Long aLong) {
-                                            onFaceFeatureInfoGet(faceFeature, requestId, errorCode);
-                                        }
-
-                                        @Override
-                                        public void onError(Throwable e) {
-
-                                        }
-
-                                        @Override
-                                        public void onComplete() {
-                                            getFeatureDelayedDisposables.remove(disposable);
-                                        }
-                                    });
-                        }
-                    }
-
-                }
-                //特征提取失败
-                else {
-                    if (increaseAndGetValue(extractErrorRetryMap, requestId) > MAX_RETRY_TIME) {
-                        extractErrorRetryMap.put(requestId, 0);
-
-                        String msg;
-                        // 传入的FaceInfo在指定的图像上无法解析人脸，此处使用的是RGB人脸数据，一般是人脸模糊
-                        if (errorCode != null && errorCode == ErrorInfo.MERR_FSDK_FACEFEATURE_LOW_CONFIDENCE_LEVEL) {
-                            msg = getString(R.string.low_confidence_level);
-                        } else {
-                            msg = "ExtractCode:" + errorCode;
-                        }
-                        faceHelper.setName(requestId, getString(R.string.recognize_failed_notice, msg));
-                        // 在尝试最大次数后，特征提取仍然失败，则认为识别未通过
-                        requestFeatureStatusMap.put(requestId, RequestFeatureStatus.FAILED);
-                        retryRecognizeDelayed(requestId);
-                    } else {
-                        requestFeatureStatusMap.put(requestId, RequestFeatureStatus.TO_RETRY);
-                    }
-                }
-            }
-
-            @Override
-            public void onFaceLivenessInfoGet(@Nullable LivenessInfo livenessInfo, final Integer requestId, Integer errorCode) {
+            public void onFaceLivenessInfoGet(@Nullable LivenessInfo livenessInfo, final Integer requestId, Integer errorCode, final byte[] nv21, final Camera camera) {
                 if (livenessInfo != null) {
                     int liveness = livenessInfo.getLiveness();
                     livenessMap.put(requestId, liveness);
@@ -411,7 +332,7 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                 }
                 List<FacePreviewInfo> facePreviewInfoList = faceHelper.onPreviewFrame(nv21);
                 if (facePreviewInfoList != null && faceRectView != null && drawHelper != null) {
-                    drawPreviewInfo(facePreviewInfoList);
+                    drawPreviewInfo(facePreviewInfoList, nv21, camera);
                 }
                 clearLeftFace(facePreviewInfoList);
 
@@ -427,7 +348,7 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                             if (liveness == null
                                     || (liveness != LivenessInfo.ALIVE && liveness != LivenessInfo.NOT_ALIVE && liveness != RequestLivenessStatus.ANALYZING)) {
                                 livenessMap.put(facePreviewInfoList.get(i).getTrackId(), RequestLivenessStatus.ANALYZING);
-                                faceHelper.requestFaceLiveness(nv21, facePreviewInfoList.get(i).getFaceInfo(), previewSize.width, previewSize.height, FaceEngine.CP_PAF_NV21, facePreviewInfoList.get(i).getTrackId(), LivenessType.RGB);
+                                faceHelper.requestFaceLiveness(camera, nv21, facePreviewInfoList.get(i).getFaceInfo(), previewSize.width, previewSize.height, FaceEngine.CP_PAF_NV21, facePreviewInfoList.get(i).getTrackId(), LivenessType.RGB);
                             }
                         }
                         /**
@@ -437,7 +358,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                         if (status == null
                                 || status == RequestFeatureStatus.TO_RETRY) {
                             requestFeatureStatusMap.put(facePreviewInfoList.get(i).getTrackId(), RequestFeatureStatus.SEARCHING);
-                            faceHelper.requestFaceFeature(nv21, facePreviewInfoList.get(i).getFaceInfo(), previewSize.width, previewSize.height, FaceEngine.CP_PAF_NV21, facePreviewInfoList.get(i).getTrackId());
 //                            Log.i(TAG, "onPreview: fr start = " + System.currentTimeMillis() + " trackId = " + facePreviewInfoList.get(i).getTrackedFaceCount());
                         }
                     }
@@ -453,14 +373,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
             public void onCameraError(Exception e) {
                 Log.i(TAG, "onCameraError: " + e.getMessage());
             }
-
-            @Override
-            public void onCameraConfigurationChanged(int cameraID, int displayOrientation) {
-                if (drawHelper != null) {
-                    drawHelper.setCameraDisplayOrientation(displayOrientation);
-                }
-                Log.i(TAG, "onCameraConfigurationChanged: " + cameraID + "  " + displayOrientation);
-            }
         };
 
         cameraHelper = new CameraHelper.Builder()
@@ -475,7 +387,7 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
         cameraHelper.start();
     }
 
-    private void drawPreviewInfo(List<FacePreviewInfo> facePreviewInfoList) {
+    private void drawPreviewInfo(List<FacePreviewInfo> facePreviewInfoList, byte[] nv21, Camera camera) {
         List<DrawInfo> drawInfoList = new ArrayList<>();
         for (int i = 0; i < facePreviewInfoList.size(); i++) {
             String name = faceHelper.getName(facePreviewInfoList.get(i).getTrackId());
@@ -485,6 +397,15 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
             int color = RecognizeColor.COLOR_UNKNOWN;
             if (liveness != null && liveness == LivenessInfo.ALIVE) {
                 color = RecognizeColor.COLOR_SUCCESS;
+                count ++;
+                Log.e(TAG, count + "");
+                if (count == 64) {
+                    cut(nv21, facePreviewInfoList);
+                    cameraHelper.release();
+                    Intent intent = new Intent(RegisterAndRecognizeActivity.this, ShowActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
             if (liveness != null && liveness == LivenessInfo.NOT_ALIVE) {
                 color = RecognizeColor.COLOR_FAILED;
@@ -553,78 +474,6 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
 
     }
 
-    private void searchFace(final FaceFeature frFace, final Integer requestId) {
-        Observable
-                .create(new ObservableOnSubscribe<CompareResult>() {
-                    @Override
-                    public void subscribe(ObservableEmitter<CompareResult> emitter) {
-//                        Log.i(TAG, "subscribe: fr search start = " + System.currentTimeMillis() + " trackId = " + requestId);
-                        CompareResult compareResult = FaceServer.getInstance().getTopOfFaceLib(frFace);
-//                        Log.i(TAG, "subscribe: fr search end = " + System.currentTimeMillis() + " trackId = " + requestId);
-                        emitter.onNext(compareResult);
-
-                    }
-                })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<CompareResult>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(CompareResult compareResult) {
-                        if (compareResult == null || compareResult.getUserName() == null) {
-                            requestFeatureStatusMap.put(requestId, RequestFeatureStatus.FAILED);
-                            faceHelper.setName(requestId, "VISITOR " + requestId);
-                            return;
-                        }
-
-//                        Log.i(TAG, "onNext: fr search get result  = " + System.currentTimeMillis() + " trackId = " + requestId + "  similar = " + compareResult.getSimilar());
-                        if (compareResult.getSimilar() > SIMILAR_THRESHOLD) {
-                            boolean isAdded = false;
-                            if (compareResultList == null) {
-                                requestFeatureStatusMap.put(requestId, RequestFeatureStatus.FAILED);
-                                faceHelper.setName(requestId, "VISITOR " + requestId);
-                                return;
-                            }
-                            for (CompareResult compareResult1 : compareResultList) {
-                                if (compareResult1.getTrackId() == requestId) {
-                                    isAdded = true;
-                                    break;
-                                }
-                            }
-                            if (!isAdded) {
-                                //对于多人脸搜索，假如最大显示数量为 MAX_DETECT_NUM 且有新的人脸进入，则以队列的形式移除
-                                if (compareResultList.size() >= MAX_DETECT_NUM) {
-                                    compareResultList.remove(0);
-                                }
-                                //添加显示人员时，保存其trackId
-                                compareResult.setTrackId(requestId);
-                                compareResultList.add(compareResult);
-                            }
-                            requestFeatureStatusMap.put(requestId, RequestFeatureStatus.SUCCEED);
-                            faceHelper.setName(requestId, getString(R.string.recognize_success_notice, compareResult.getUserName()));
-
-                        } else {
-                            faceHelper.setName(requestId, getString(R.string.recognize_failed_notice, "NOT_REGISTERED"));
-                            retryRecognizeDelayed(requestId);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        faceHelper.setName(requestId, getString(R.string.recognize_failed_notice, "NOT_REGISTERED"));
-                        retryRecognizeDelayed(requestId);
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
 
     /**
      * 在{@link #previewView}第一次布局完成后，去除该监听，并且进行引擎和相机的初始化
@@ -697,40 +546,20 @@ public class RegisterAndRecognizeActivity extends BaseActivity implements ViewTr
                 });
     }
 
-    /**
-     * 延迟 FAIL_RETRY_INTERVAL 重新进行人脸识别
-     *
-     * @param requestId 人脸ID
-     */
-    private void retryRecognizeDelayed(final Integer requestId) {
-        requestFeatureStatusMap.put(requestId, RequestFeatureStatus.FAILED);
-        Observable.timer(FAIL_RETRY_INTERVAL, TimeUnit.MILLISECONDS)
-                .subscribe(new Observer<Long>() {
-                    Disposable disposable;
+    private void cut(byte[] nv21, List<FacePreviewInfo> facePreviewInfoList) {
+        int width = previewSize.width;
+        int height = previewSize.height;
 
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        disposable = d;
-                        delayFaceTaskCompositeDisposable.add(disposable);
-                    }
+        FaceInfo faceInfo = facePreviewInfoList.get(0).getFaceInfo();
+        Rect cropRect = FaceServer.getBestRect(width, height, faceInfo.getRect());
 
-                    @Override
-                    public void onNext(Long aLong) {
+        cropRect.left &= ~3;
+        cropRect.top &= ~3;
+        cropRect.right &= ~3;
+        cropRect.bottom &= ~3;
 
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        // 将该人脸特征提取状态置为FAILED，帧回调处理时会重新进行活体检测
-                        faceHelper.setName(requestId, Integer.toString(requestId));
-                        requestFeatureStatusMap.put(requestId, RequestFeatureStatus.TO_RETRY);
-                        delayFaceTaskCompositeDisposable.remove(disposable);
-                    }
-                });
+        Bitmap bitmap = FaceServer.getHeadImage(nv21.clone(), width, height, faceInfo.getOrient(), cropRect, ArcSoftImageFormat.NV21);
+        MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", "discription");
     }
+
 }

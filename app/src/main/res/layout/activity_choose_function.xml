@@ -16,13 +16,6 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="activeEngine"
-            android:text="@string/active_engine" />
-
-        <Button
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:onClick="jumpToFaceRecognizeActivity"
             android:text="@string/page_face_recognize" />
 

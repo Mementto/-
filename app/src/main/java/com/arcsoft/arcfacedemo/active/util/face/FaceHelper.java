@@ -1,13 +1,12 @@
-package com.arcsoft.arcfacedemo.util.face;
+package com.arcsoft.arcfacedemo.active.util.face;
 
 import android.hardware.Camera;
 import android.util.Log;
 
-import com.arcsoft.arcfacedemo.model.FacePreviewInfo;
-import com.arcsoft.arcfacedemo.util.TrackUtil;
+import com.arcsoft.arcfacedemo.active.model.FacePreviewInfo;
+import com.arcsoft.arcfacedemo.active.util.TrackUtil;
 import com.arcsoft.face.ErrorInfo;
 import com.arcsoft.face.FaceEngine;
-import com.arcsoft.face.FaceFeature;
 import com.arcsoft.face.FaceInfo;
 import com.arcsoft.face.LivenessInfo;
 import java.util.ArrayList;
@@ -123,26 +122,6 @@ public class FaceHelper {
     }
 
     /**
-     * 请求获取人脸特征数据
-     *
-     * @param nv21     图像数据
-     * @param faceInfo 人脸信息
-     * @param width    图像宽度
-     * @param height   图像高度
-     * @param format   图像格式
-     * @param trackId  请求人脸特征的唯一请求码，一般使用trackId
-     */
-    public void requestFaceFeature(byte[] nv21, FaceInfo faceInfo, int width, int height, int format, Integer trackId) {
-        if (faceListener != null) {
-            if (frEngine != null && frThreadQueue.remainingCapacity() > 0) {
-                frExecutor.execute(new FaceRecognizeRunnable(nv21, faceInfo, width, height, format, trackId));
-            } else {
-                faceListener.onFaceFeatureInfoGet(null, trackId, ERROR_BUSY);
-            }
-        }
-    }
-
-    /**
      * 请求获取活体检测结果，需要传入活体的参数，以下参数同
      *
      * @param nv21         NV21格式的图像数据
@@ -153,12 +132,12 @@ public class FaceHelper {
      * @param trackId      请求人脸特征的唯一请求码，一般使用trackId
      * @param livenessType 活体检测类型
      */
-    public void requestFaceLiveness(byte[] nv21, FaceInfo faceInfo, int width, int height, int format, Integer trackId, LivenessType livenessType) {
+    public void requestFaceLiveness(Camera camera, byte[] nv21, FaceInfo faceInfo, int width, int height, int format, Integer trackId, LivenessType livenessType) {
         if (faceListener != null) {
             if (flEngine != null && flThreadQueue.remainingCapacity() > 0) {
-                flExecutor.execute(new FaceLivenessDetectRunnable(nv21, faceInfo, width, height, format, trackId, livenessType));
+                flExecutor.execute(new FaceLivenessDetectRunnable(camera, nv21, faceInfo, width, height, format, trackId, livenessType));
             } else {
-                faceListener.onFaceLivenessInfoGet(null, trackId, ERROR_BUSY);
+                faceListener.onFaceLivenessInfoGet(null, trackId, ERROR_BUSY, null, null);
             }
         }
     }
@@ -229,54 +208,6 @@ public class FaceHelper {
         }
     }
 
-    /**
-     * 人脸特征提取线程
-     */
-    public class FaceRecognizeRunnable implements Runnable {
-        private FaceInfo faceInfo;
-        private int width;
-        private int height;
-        private int format;
-        private Integer trackId;
-        private byte[] nv21Data;
-
-        private FaceRecognizeRunnable(byte[] nv21Data, FaceInfo faceInfo, int width, int height, int format, Integer trackId) {
-            if (nv21Data == null) {
-                return;
-            }
-            this.nv21Data = nv21Data;
-            this.faceInfo = new FaceInfo(faceInfo);
-            this.width = width;
-            this.height = height;
-            this.format = format;
-            this.trackId = trackId;
-        }
-
-        @Override
-        public void run() {
-            if (faceListener != null && nv21Data != null) {
-                if (frEngine != null) {
-                    FaceFeature faceFeature = new FaceFeature();
-                    long frStartTime = System.currentTimeMillis();
-                    int frCode;
-                    synchronized (frEngine) {
-                        frCode = frEngine.extractFaceFeature(nv21Data, width, height, format, faceInfo, faceFeature);
-                    }
-                    if (frCode == ErrorInfo.MOK) {
-//                        Log.i(TAG, "run: fr costTime = " + (System.currentTimeMillis() - frStartTime) + "ms");
-                        faceListener.onFaceFeatureInfoGet(faceFeature, trackId, frCode);
-                    } else {
-                        faceListener.onFaceFeatureInfoGet(null, trackId, frCode);
-                        faceListener.onFail(new Exception("fr failed errorCode is " + frCode));
-                    }
-                } else {
-                    faceListener.onFaceFeatureInfoGet(null, trackId, ERROR_FR_ENGINE_IS_NULL);
-                    faceListener.onFail(new Exception("fr failed ,frEngine is null"));
-                }
-            }
-            nv21Data = null;
-        }
-    }
 
     /**
      * 活体检测的线程
@@ -289,8 +220,9 @@ public class FaceHelper {
         private Integer trackId;
         private byte[] nv21Data;
         private LivenessType livenessType;
+        private Camera camera;
 
-        private FaceLivenessDetectRunnable(byte[] nv21Data, FaceInfo faceInfo, int width, int height, int format, Integer trackId, LivenessType livenessType) {
+        private FaceLivenessDetectRunnable(Camera camera, byte[] nv21Data, FaceInfo faceInfo, int width, int height, int format, Integer trackId, LivenessType livenessType) {
             if (nv21Data == null) {
                 return;
             }
@@ -301,6 +233,7 @@ public class FaceHelper {
             this.format = format;
             this.trackId = trackId;
             this.livenessType = livenessType;
+            this.camera = camera;
         }
 
         @Override
@@ -325,13 +258,13 @@ public class FaceHelper {
                     }
 
                     if (flCode == ErrorInfo.MOK && livenessInfoList.size() > 0) {
-                        faceListener.onFaceLivenessInfoGet(livenessInfoList.get(0), trackId, flCode);
+                        faceListener.onFaceLivenessInfoGet(livenessInfoList.get(0), trackId, flCode, nv21Data, camera);
                     } else {
-                        faceListener.onFaceLivenessInfoGet(null, trackId, flCode);
+                        faceListener.onFaceLivenessInfoGet(null, trackId, flCode, null, null);
                         faceListener.onFail(new Exception("fl failed errorCode is " + flCode));
                     }
                 } else {
-                    faceListener.onFaceLivenessInfoGet(null, trackId, ERROR_FL_ENGINE_IS_NULL);
+                    faceListener.onFaceLivenessInfoGet(null, trackId, ERROR_FL_ENGINE_IS_NULL, null, null);
                     faceListener.onFail(new Exception("fl failed ,frEngine is null"));
                 }
             }

@@ -1,6 +1,5 @@
-package com.arcsoft.arcfacedemo.util;
+package com.arcsoft.arcfacedemo.active.util;
 
-import android.graphics.Rect;
 import com.arcsoft.face.FaceInfo;
 
 import java.util.List;

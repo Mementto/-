@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.util.camera;
+package com.arcsoft.arcfacedemo.active.util.camera;
 
 import android.hardware.Camera;
 
@@ -31,10 +31,4 @@ public interface CameraListener {
      */
     void onCameraError(Exception e);
 
-    /**
-     * 属性变化时调用
-     * @param cameraID  相机ID
-     * @param displayOrientation    相机旋转方向
-     */
-    void onCameraConfigurationChanged(int cameraID, int displayOrientation);
 }

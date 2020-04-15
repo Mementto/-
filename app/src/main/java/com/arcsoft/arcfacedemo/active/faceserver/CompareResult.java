@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.faceserver;
+package com.arcsoft.arcfacedemo.active.faceserver;
 
 
 

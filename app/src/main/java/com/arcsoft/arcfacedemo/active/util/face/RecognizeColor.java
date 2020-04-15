@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.util.face;
+package com.arcsoft.arcfacedemo.active.util.face;
 
 import android.graphics.Color;
 

@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.util.face;
+package com.arcsoft.arcfacedemo.active.util.face;
 
 public class RequestFeatureStatus {
     public static final int SEARCHING = 0;

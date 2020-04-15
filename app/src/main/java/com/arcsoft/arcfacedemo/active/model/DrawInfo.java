@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.model;
+package com.arcsoft.arcfacedemo.active.model;
 
 import android.graphics.Rect;
 

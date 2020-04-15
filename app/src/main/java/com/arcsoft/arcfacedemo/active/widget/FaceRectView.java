@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.widget;
+package com.arcsoft.arcfacedemo.active.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,8 +6,8 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.arcsoft.arcfacedemo.model.DrawInfo;
-import com.arcsoft.arcfacedemo.util.DrawHelper;
+import com.arcsoft.arcfacedemo.active.model.DrawInfo;
+import com.arcsoft.arcfacedemo.active.util.DrawHelper;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

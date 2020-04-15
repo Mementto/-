@@ -1,7 +1,6 @@
-package com.arcsoft.arcfacedemo.model;
+package com.arcsoft.arcfacedemo.active.model;
 
 import com.arcsoft.face.FaceInfo;
-import com.arcsoft.face.LivenessInfo;
 
 public class FacePreviewInfo {
     private FaceInfo faceInfo;

@@ -1,4 +1,4 @@
-package com.arcsoft.arcfacedemo.common;
+package com.arcsoft.arcfacedemo.active.common;
 
 public class Constants {
 
