@@ -1,5 +1,7 @@
 package com.arcsoft.arcfacedemo.api;
 
+import com.arcsoft.arcfacedemo.repository.UserBean;
+
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -31,11 +33,14 @@ public interface CallApi {
     Call<ResponseBody> recognizeImage(@Part MultipartBody.Part img);
 
     @POST("user/login")
-    Call<Long> login(@Query("username") String username, @Query("password") String password);
+    Call<UserBean> login(@Query("username") String username, @Query("password") String password);
 
     @POST("user/register/username")
     Call<Integer> submitUsername(@Query("username") String username);
 
     @POST("user/register")
-    Call<Long> register(@Query("username") String username, @Query("password") String password, @Query("passwordAgain") String passwordAgain);
+    Call<UserBean> register(@Query("username") String username, @Query("password") String password, @Query("passwordAgain") String passwordAgain);
+
+    @POST("user/login/id")
+    Call<ResponseBody> submitUserId(@Query("userId") Long userId);
 }

@@ -2,6 +2,7 @@ package com.arcsoft.arcfacedemo.register;
 
 import android.view.View;
 
+import com.arcsoft.arcfacedemo.repository.UserBean;
 import com.arcsoft.arcfacedemo.utils.Data;
 import com.arcsoft.arcfacedemo.utils.Storage;
 
@@ -21,7 +22,8 @@ public class RegisterViewModel extends ViewModel {
     private String passwordDataAgain;
     private MutableLiveData<Integer> usernameResult;
     private MutableLiveData<Integer> passwordResult;
-    private MutableLiveData<Long> registerResult;
+    private MutableLiveData<UserBean> registerResult;
+    private MutableLiveData<Boolean> returnTo;
     private RegisterModel model;
 
 
@@ -54,15 +56,30 @@ public class RegisterViewModel extends ViewModel {
         this.passwordResult.setValue(result);
     }
 
-    public void registerSuccess(Long result) {
-        this.registerResult.setValue(result);
+    public void registerSuccess(UserBean userBean) {
+        this.registerResult.setValue(userBean);
     }
 
-    public MutableLiveData<Long> getRegisterResult() {
+    public void returnTo(View view) {
+        if (getReturnTo().getValue() == null) {
+            getReturnTo().setValue(false);
+        } else {
+            getReturnTo().setValue(! getReturnTo().getValue());
+        }
+    }
+
+    public MutableLiveData<UserBean> getRegisterResult() {
         if (registerResult == null) {
             registerResult = new MutableLiveData<>();
         }
         return registerResult;
+    }
+
+    public MutableLiveData<Boolean> getReturnTo() {
+        if (returnTo == null) {
+            returnTo = new MutableLiveData<>();
+        }
+        return returnTo;
     }
 
     public MutableLiveData<Integer> getUsernameResult() {

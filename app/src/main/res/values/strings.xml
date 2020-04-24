@@ -18,6 +18,25 @@
     <!--登录界面-->
     <string name="login_title">登录</string>
     <string name="login_verification">登录验证</string>
+    <string name="not_register">未注册？</string>
+    <string name="go_to_register">前往注册</string>
+
+    <!--主界面-->
+    <string name="main_films">电影</string>
+    <string name="main_activity">活动</string>
+    <string name="main_store">商城</string>
+    <string name="main_mine">我</string>
+
+    <!--我的界面-->
+    <string name="mine_order">我的订单</string>
+    <string name="mine_wallet">我的钱包</string>
+    <string name="mine_face_register">人脸注册</string>
+    <string name="mine_film_list">我的影单</string>
+    <string name="mine_customer_service">联系客服</string>
+    <string name="mine_very_important_people">我的会员</string>
+    <string name="mine_set_up">设置</string>
+    <string name="face_success">人脸录入成功</string>
+    <string name="i_know">我知道了</string>
 
 
     <string name="library_not_found">未找到库文件，请检查是否有将.so文件放至工程的 app\\src\\main\\jniLibs 目录下</string>

@@ -37,6 +37,8 @@ import com.arcsoft.arcfacedemo.facerepository.active.util.face.RequestFeatureSta
 import com.arcsoft.arcfacedemo.facerepository.active.util.face.RequestLivenessStatus;
 import com.arcsoft.arcfacedemo.facerepository.activity.BaseActivity;
 import com.arcsoft.arcfacedemo.facerepository.activity.ShowActivity;
+import com.arcsoft.arcfacedemo.main.MainActivity;
+import com.arcsoft.arcfacedemo.utils.LayoutUtil;
 import com.arcsoft.arcfacedemo.utils.Storage;
 import com.arcsoft.face.AgeInfo;
 import com.arcsoft.face.ErrorInfo;
@@ -144,6 +146,7 @@ public class FaceRecognizeActivity extends BaseActivity implements ViewTreeObser
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LayoutUtil.setNullStatusBar(getWindow());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_face_recognize);
         viewModel = ViewModelProviders.of(this).get(FaceRegisterViewModel.class);
         binding.setRegister(viewModel);
@@ -406,12 +409,18 @@ public class FaceRecognizeActivity extends BaseActivity implements ViewTreeObser
                     cut(nv21, facePreviewInfoList);
                     String path = getFilePathFromContentUri(Uri.parse(url), this.getContentResolver());
 //                    Long userId = Storage.getUserId(this);
-                    Long userId = (long) 2;
+                    Long userId = Storage.getUserId(this);
                     viewModel.submitFace(path, userId);
                     viewModel.getResult().observe(this, new androidx.lifecycle.Observer<Integer>() {
                         @Override
                         public void onChanged(Integer integer) {
                             cameraHelper.release();
+                            Storage.setFacePath(FaceRecognizeActivity.this, integer + "");
+                            Intent intent = new Intent(FaceRecognizeActivity.this, MainActivity.class);
+                            Bundle bundle = getIntent().getExtras();
+                            bundle.putInt("upload_face_result", integer);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
                             finish();
                         }
                     });

@@ -11,4 +11,9 @@
     <color name="color_deep_gray">#2c2c2c</color>
     <color name="color_main">#DBB177</color>
     <color name="color_main_red">#D81E06</color>
+    <color name="color_white">#FFF</color>
+
+    <color name="color_deep_dark">#31333B</color>
+    <color name="color_center_dark">#41454F</color>
+    <color name="color_light_dark">#4A4D5A</color>
 </resources>

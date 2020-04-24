@@ -1,6 +1,7 @@
 package com.arcsoft.arcfacedemo.register;
 
 import com.arcsoft.arcfacedemo.api.CallApi;
+import com.arcsoft.arcfacedemo.repository.UserBean;
 import com.arcsoft.arcfacedemo.utils.Data;
 
 import retrofit2.Call;
@@ -51,21 +52,21 @@ public class RegisterModel {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         CallApi api = retrofit.create(CallApi.class);
-        Call<Long> call = api.register(username, password, passwordAgain);
-        call.enqueue(new Callback<Long>() {
+        Call<UserBean> call = api.register(username, password, passwordAgain);
+        call.enqueue(new Callback<UserBean>() {
             @Override
-            public void onResponse(Call<Long> call, Response<Long> response) {
-                if (response.body().intValue() == -3 || response.body().intValue() == -4) {
-                    viewModel.submitInfoPasswordError(response.body().intValue());
-                } else if (response.body() == -2 || response.body() == -1) {
-                    viewModel.submitUsernameResult(response.body().intValue());
+            public void onResponse(Call<UserBean> call, Response<UserBean> response) {
+                if (response.body().getUserId().intValue() == -3 || response.body().getUserId().intValue() == -4) {
+                    viewModel.submitInfoPasswordError(response.body().getUserId().intValue());
+                } else if (response.body().getUserId() == -2 || response.body().getUserId() == -1) {
+                    viewModel.submitUsernameResult(response.body().getUserId().intValue());
                 } else {
                     viewModel.registerSuccess(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<Long> call, Throwable t) {
+            public void onFailure(Call<UserBean> call, Throwable t) {
                 viewModel.submitUsernameResult(Data.INTERNET_ERROR_CODE);
             }
         });

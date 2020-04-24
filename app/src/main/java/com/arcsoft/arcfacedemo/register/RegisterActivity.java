@@ -1,12 +1,14 @@
 package com.arcsoft.arcfacedemo.register;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.arcsoft.arcfacedemo.R;
 import com.arcsoft.arcfacedemo.databinding.ActivityRegisterBinding;
+import com.arcsoft.arcfacedemo.main.MainActivity;
+import com.arcsoft.arcfacedemo.repository.UserBean;
 import com.arcsoft.arcfacedemo.utils.Data;
 import com.arcsoft.arcfacedemo.utils.LayoutUtil;
 import com.arcsoft.arcfacedemo.utils.Storage;
@@ -115,11 +117,17 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
-        binding.getViewModel().getRegisterResult().observe(this, new Observer<Long>() {
+        binding.getViewModel().getRegisterResult().observe(this, new Observer<UserBean>() {
             @Override
-            public void onChanged(Long aLong) {
-                Log.e("结果", aLong + "");
-                registerSuccess(aLong);
+            public void onChanged(UserBean userBean) {
+                registerSuccess(userBean);
+            }
+        });
+
+        viewModel.getReturnTo().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                finish();
             }
         });
     }
@@ -128,8 +136,13 @@ public class RegisterActivity extends AppCompatActivity {
         Toast.makeText(this, info, Toast.LENGTH_SHORT).show();
     }
 
-    public void registerSuccess(Long aLong) {
-        Storage.setUserId(this, aLong);
+    public void registerSuccess(UserBean userBean) {
+        Storage.setUserInfo(this, userBean);
+        Bundle bundle = this.getIntent().getExtras();
+        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        finish();
     }
 
 }

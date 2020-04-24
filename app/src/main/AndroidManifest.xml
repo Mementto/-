@@ -5,17 +5,18 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/intelligence_cinema"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.PreviewActivity"
+            android:name=".main.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,11 +26,16 @@
         </activity>
 
         <activity
-            android:name=".activity.RegisterAndRecognizeActivity"
+            android:name=".face.FaceRecognizeActivity"
             android:launchMode="singleTop" />
 
-        <activity android:name=".activity.ShowActivity"/>
-        <activity android:name=".activity.ChooseFunctionActivity"/>
+        <activity android:name=".face.IsFaceRegisterActivity"/>
+        <activity android:name=".facerepository.activity.ShowActivity"/>
+        <activity android:name=".facerepository.activity.ChooseFunctionActivity"/>
+        <activity android:name=".facerepository.activity.RecognizeActivity"/>
+        <activity android:name=".facerepository.activity.RecognizeAndRecognizeActive"/>
+        <activity android:name=".register.RegisterActivity"/>
+        <activity android:name=".login.LoginActivity"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

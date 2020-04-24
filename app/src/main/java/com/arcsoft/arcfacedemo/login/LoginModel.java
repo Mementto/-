@@ -1,6 +1,9 @@
 package com.arcsoft.arcfacedemo.login;
 
+import android.util.Log;
+
 import com.arcsoft.arcfacedemo.api.CallApi;
+import com.arcsoft.arcfacedemo.repository.UserBean;
 import com.arcsoft.arcfacedemo.utils.Data;
 
 import retrofit2.Call;
@@ -24,16 +27,16 @@ public class LoginModel {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         CallApi api = retrofit.create(CallApi.class);
-        Call<Long> call = api.login(username, password);
-        call.enqueue(new Callback<Long>() {
+        Call<UserBean> call = api.login(username, password);
+        call.enqueue(new Callback<UserBean>() {
             @Override
-            public void onResponse(Call<Long> call, Response<Long> response) {
+            public void onResponse(Call<UserBean> call, Response<UserBean> response) {
                 viewModel.loginResult(response.body());
             }
 
             @Override
-            public void onFailure(Call<Long> call, Throwable t) {
-                viewModel.loginResult(new Long(Data.INTERNET_ERROR_CODE));
+            public void onFailure(Call<UserBean> call, Throwable t) {
+                viewModel.loginResultFail(Data.INTERNET_ERROR_INFO);
             }
         });
     }

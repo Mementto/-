@@ -19,7 +19,8 @@
 
             <RelativeLayout
                 android:layout_width="50dp"
-                android:layout_height="50dp">
+                android:layout_height="50dp"
+                android:onClick="@{view_model :: returnTo}">
 
                 <ImageView
                     android:layout_width="18dp"
