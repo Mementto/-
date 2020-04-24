@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable
+            name="preview"
+            type="com.arcsoft.arcfacedemo.facerepository.activity.PreviewActivity" />
+    </data>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
@@ -9,7 +15,8 @@
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="activeEngine"
-        android:text="@string/active_engine" />
+        android:onClick="@{preview :: activeEngine}"
+        android:text="激活引擎" />
 
 </RelativeLayout>
+</layout>

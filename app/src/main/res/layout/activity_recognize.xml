@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout>
-    
+
     <data>
         <variable
-            name="show_photo"
-            type="com.arcsoft.arcfacedemo.facerepository.activity.ShowActivity" />
+            name="out"
+            type="com.arcsoft.arcfacedemo.facerepository.activity.RecognizeActivity" />
     </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <Button
-            android:id="@+id/img"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:onClick="@{show_photo :: onClick}"/>
 
     </LinearLayout>
 
