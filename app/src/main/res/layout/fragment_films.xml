@@ -1,11 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="1"/>
+    <data>
+        <variable
+            name="view_model"
+            type="com.arcsoft.arcfacedemo.films.FilmsViewModel" />
+    </data>
 
-</LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:onClick="@{view_model :: onClickCity}">
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    android:id="@+id/films_city_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/color_deep_gray"
+                    android:textSize="13dp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@mipmap/icon_down_deep_gray"/>
+
+            </LinearLayout>
+
+            <RadioGroup
+                android:id="@+id/film_radios_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_centerInParent="true">
+
+                <RadioButton
+                    android:id="@+id/film_radio_left"
+                    android:layout_width="40dp"
+                    android:layout_height="25dp"
+                    android:button="@null"
+                    android:text="@string/films"
+                    android:textSize="13dp"
+                    android:gravity="center"
+                    android:background="@drawable/radio_left"/>
+
+                <RadioButton
+                    android:id="@+id/film_radio_right"
+                    android:layout_width="40dp"
+                    android:layout_height="25dp"
+                    android:button="@null"
+                    android:text="@string/cinema"
+                    android:textSize="13dp"
+                    android:gravity="center"
+                    android:background="@drawable/radio_right"/>
+
+            </RadioGroup>
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="@color/color_light_gray"/>
+
+        <FrameLayout
+            android:id="@+id/film_and_cinema"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+</layout>

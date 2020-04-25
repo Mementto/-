@@ -11,6 +11,7 @@ import com.arcsoft.arcfacedemo.main.MainActivity;
 import com.arcsoft.arcfacedemo.register.RegisterActivity;
 import com.arcsoft.arcfacedemo.repository.UserBean;
 import com.arcsoft.arcfacedemo.utils.Data;
+import com.arcsoft.arcfacedemo.utils.LayoutUtil;
 import com.arcsoft.arcfacedemo.utils.Storage;
 
 import androidx.annotation.Nullable;
@@ -27,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LayoutUtil.setWhiteStatusBar(getWindow());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         binding.setViewModel(viewModel);

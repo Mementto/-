@@ -38,6 +38,15 @@
     <string name="face_success">人脸录入成功</string>
     <string name="i_know">我知道了</string>
 
+    <string name="films">电影</string>
+    <string name="cinema">影院</string>
+
+    <string name="choose_city">选择城市</string>
+    <string name="search">搜索</string>
+    <string name="enter_city_name">请输入城市名字</string>
+    <string name="now_location_city">当前定位城市</string>
+    <string name="hot_city">热门城市</string>
+
 
     <string name="library_not_found">未找到库文件，请检查是否有将.so文件放至工程的 app\\src\\main\\jniLibs 目录下</string>
     <string name="specific_engine_init_failed">%s 初始化失败，错误码为:%d</string>

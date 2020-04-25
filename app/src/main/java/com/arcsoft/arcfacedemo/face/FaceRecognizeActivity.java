@@ -35,8 +35,6 @@ import com.arcsoft.arcfacedemo.facerepository.active.util.face.LivenessType;
 import com.arcsoft.arcfacedemo.facerepository.active.util.face.RecognizeColor;
 import com.arcsoft.arcfacedemo.facerepository.active.util.face.RequestFeatureStatus;
 import com.arcsoft.arcfacedemo.facerepository.active.util.face.RequestLivenessStatus;
-import com.arcsoft.arcfacedemo.facerepository.activity.BaseActivity;
-import com.arcsoft.arcfacedemo.facerepository.activity.ShowActivity;
 import com.arcsoft.arcfacedemo.main.MainActivity;
 import com.arcsoft.arcfacedemo.utils.LayoutUtil;
 import com.arcsoft.arcfacedemo.utils.Storage;

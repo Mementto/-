@@ -8,11 +8,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.arcsoft.arcfacedemo.R;
-import com.arcsoft.arcfacedemo.databinding.ActivityChooseFunctionBinding;
 import com.arcsoft.arcfacedemo.databinding.ActivityIsFaceRegisterBinding;
 import com.arcsoft.arcfacedemo.facerepository.active.common.Constants;
-import com.arcsoft.arcfacedemo.facerepository.activity.BaseActivity;
-import com.arcsoft.arcfacedemo.facerepository.activity.ChooseFunctionActivity;
 import com.arcsoft.arcfacedemo.utils.Data;
 import com.arcsoft.arcfacedemo.utils.LayoutUtil;
 import com.arcsoft.arcfacedemo.utils.Storage;
