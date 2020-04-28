@@ -40,6 +40,7 @@
         </LinearLayout>
 
         <RelativeLayout
+            android:id="@+id/choose_now_city_name"
             android:layout_width="match_parent"
             android:layout_height="45dp">
 
@@ -63,6 +64,7 @@
             </LinearLayout>
 
             <RelativeLayout
+                android:id="@+id/refresh_city_name"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_alignParentRight="true">
@@ -112,6 +114,7 @@
                 android:layout_height="match_parent" />
 
             <TextView
+                android:id="@+id/beijing"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|left"
@@ -120,6 +123,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/shanghai"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|left"
@@ -128,6 +132,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/guangzhou"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|left"
@@ -136,6 +141,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/shenzhen"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:gravity="center|left"

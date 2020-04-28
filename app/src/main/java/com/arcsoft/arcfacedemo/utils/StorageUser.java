@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 
 import com.arcsoft.arcfacedemo.repository.UserBean;
 
-public class Storage {
+public class StorageUser {
     public static void setUserInfo(Context context, UserBean userBean) {
         SharedPreferences preferences = context.getSharedPreferences("session", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();

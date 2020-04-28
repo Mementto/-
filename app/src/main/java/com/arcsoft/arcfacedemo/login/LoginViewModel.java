@@ -1,11 +1,8 @@
 package com.arcsoft.arcfacedemo.login;
 
-import android.Manifest;
 import android.view.View;
 
-import com.arcsoft.arcfacedemo.main.MainViewModel;
 import com.arcsoft.arcfacedemo.repository.UserBean;
-import com.arcsoft.arcfacedemo.utils.Storage;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

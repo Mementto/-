@@ -4,7 +4,6 @@ import android.view.View;
 
 import com.arcsoft.arcfacedemo.repository.UserBean;
 import com.arcsoft.arcfacedemo.utils.Data;
-import com.arcsoft.arcfacedemo.utils.Storage;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

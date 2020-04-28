@@ -9,15 +9,13 @@ import android.view.ViewGroup;
 
 import com.arcsoft.arcfacedemo.R;
 import com.arcsoft.arcfacedemo.databinding.FragmentMineBinding;
-import com.arcsoft.arcfacedemo.face.FaceDialog;
 import com.arcsoft.arcfacedemo.face.IsFaceRegisterActivity;
 import com.arcsoft.arcfacedemo.login.LoginActivity;
 import com.arcsoft.arcfacedemo.utils.Data;
-import com.arcsoft.arcfacedemo.utils.Storage;
+import com.arcsoft.arcfacedemo.utils.StorageUser;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -42,12 +40,12 @@ public class MineFragment extends Fragment {
     }
 
     private void isLogin() {
-        Long userId = Storage.getUserId(getContext());
-        Log.e("id", Storage.getUserId(getContext()) + "");
+        Long userId = StorageUser.getUserId(getContext());
+        Log.e("id", StorageUser.getUserId(getContext()) + "");
         if (userId != null && userId > 0) {
             viewModel.getIsLogin().setValue(true);
-            binding.userType.setText(Storage.getUserType(getContext()) == Data.NORMAL_USER_CODE ? Data.NORMAL_USER : Data.IMPORTANT_USER);
-            binding.userName.setText(Storage.getUsername(getContext()));
+            binding.userType.setText(StorageUser.getUserType(getContext()) == Data.NORMAL_USER_CODE ? Data.NORMAL_USER : Data.IMPORTANT_USER);
+            binding.userName.setText(StorageUser.getUsername(getContext()));
         } else {
             viewModel.getIsLogin().setValue(false);
             binding.userType.setText(Data.NOT_LOGIN);

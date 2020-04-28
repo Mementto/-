@@ -12,7 +12,7 @@ import com.arcsoft.arcfacedemo.databinding.ActivityIsFaceRegisterBinding;
 import com.arcsoft.arcfacedemo.facerepository.active.common.Constants;
 import com.arcsoft.arcfacedemo.utils.Data;
 import com.arcsoft.arcfacedemo.utils.LayoutUtil;
-import com.arcsoft.arcfacedemo.utils.Storage;
+import com.arcsoft.arcfacedemo.utils.StorageUser;
 import com.arcsoft.face.ActiveFileInfo;
 import com.arcsoft.face.ErrorInfo;
 import com.arcsoft.face.FaceEngine;
@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import io.reactivex.Observable;
@@ -78,7 +77,7 @@ public class IsFaceRegisterActivity extends BaseActivity {
     }
 
     private void initData() {
-        String url = Storage.getFacePath(this);
+        String url = StorageUser.getFacePath(this);
         if (url != null && Integer.parseInt(url) > 0) {
             binding.clickEnterFace.setText(Data.CLICK_ENTER_FACE_AGAIN_INFO);
             binding.isEnterFaceInfo.setText(Data.IS_ENTER_FACE_INFO);

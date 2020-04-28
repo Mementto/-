@@ -1,8 +1,5 @@
 package com.arcsoft.arcfacedemo.main;
 
-import android.app.Dialog;
-import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,9 +12,10 @@ import com.arcsoft.arcfacedemo.mine.MineFragment;
 import com.arcsoft.arcfacedemo.store.StoreFragment;
 import com.arcsoft.arcfacedemo.utils.Data;
 import com.arcsoft.arcfacedemo.utils.LayoutUtil;
-import com.arcsoft.arcfacedemo.utils.Storage;
+import com.arcsoft.arcfacedemo.utils.StorageUser;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.baidu.mapapi.SDKInitializer;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,12 +45,13 @@ public class MainActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         binding.setViewModel(viewModel);
+        SDKInitializer.initialize(getApplicationContext());
         setFragment();
         initNavigationBar();
         submitUserId();
         eventListen();
         alert();
-        Log.e("第一", Storage.getUserId(this) + "");
+        Log.e("第一", StorageUser.getUserId(this) + "");
     }
 
     private void submitUserId() {
@@ -170,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
         binding.mainNavigationBar
                 .setMode(BottomNavigationBar.MODE_FIXED)
                 .setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
@@ -191,9 +189,5 @@ public class MainActivity extends AppCompatActivity {
                         .setInactiveIcon(ContextCompat.getDrawable(MainActivity.this, R.mipmap.icon_mine_unselect)))
                 .setFirstSelectedPosition(id)
                 .initialise();
-
-
     }
-
-
 }

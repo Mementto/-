@@ -10,7 +10,8 @@ import android.widget.RadioGroup;
 import com.arcsoft.arcfacedemo.R;
 import com.arcsoft.arcfacedemo.city.CityActivity;
 import com.arcsoft.arcfacedemo.databinding.FragmentFilmsBinding;
-import com.arcsoft.arcfacedemo.location.MyLocationListener;
+import com.arcsoft.arcfacedemo.location.NowLocationListener;
+import com.arcsoft.arcfacedemo.utils.StorageCity;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
@@ -32,7 +33,7 @@ public class FilmsFragment extends Fragment {
     private FragmentTransaction transaction;
 
     private LocationClient locationClient;
-    private MyLocationListener myLocationListener;
+    private NowLocationListener nowLocationListener;
 
     @Nullable
     @Override
@@ -43,9 +44,22 @@ public class FilmsFragment extends Fragment {
         eventListen();
         setFragment();
         initRadios();
-        getCityName();
         View view = binding.getRoot();
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        setCityName();
+    }
+
+    private void setCityName() {
+        if (StorageCity.getCityName(getContext()) != null) {
+            binding.filmsCityName.setText(StorageCity.getCityName(getContext()));
+        } else {
+            getCityName();
+        }
     }
 
     private void eventListen() {
@@ -53,8 +67,11 @@ public class FilmsFragment extends Fragment {
             @Override
             public void onChanged(String s) {
                 binding.filmsCityName.setText(s);
+                StorageCity.setCityName(getContext(), s);
+                locationClient.stop();
             }
         });
+
 
         viewModel.getGotoCity().observe(this, new Observer<Boolean>() {
             @Override
@@ -114,11 +131,12 @@ public class FilmsFragment extends Fragment {
 
     private void getCityName() {
         locationClient = new LocationClient(getContext());
-        myLocationListener = new MyLocationListener(viewModel);
-        locationClient.registerLocationListener(myLocationListener);
+        nowLocationListener = new NowLocationListener(viewModel, getContext());
+        locationClient.registerLocationListener(nowLocationListener);
         LocationClientOption option = new LocationClientOption();
         option.setIsNeedAddress(true);
         option.setNeedNewVersionRgc(true);
+        option.setOpenGps(true);
         locationClient.setLocOption(option);
         locationClient.start();
     }

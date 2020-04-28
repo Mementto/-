@@ -1,7 +1,13 @@
 package com.arcsoft.arcfacedemo.city;
 
-public class CityData {
+import com.arcsoft.arcfacedemo.BR;
 
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+
+public class CityData extends BaseObservable {
+
+    @Bindable
     private String nowName;
     private String name;
     private String firstA;
@@ -12,6 +18,7 @@ public class CityData {
 
     public void setNowName(String nowName) {
         this.nowName = nowName;
+        notifyPropertyChanged(BR.nowName);
     }
 
     public String getName() {

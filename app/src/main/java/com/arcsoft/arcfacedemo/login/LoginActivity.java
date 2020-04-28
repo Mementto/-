@@ -12,7 +12,7 @@ import com.arcsoft.arcfacedemo.register.RegisterActivity;
 import com.arcsoft.arcfacedemo.repository.UserBean;
 import com.arcsoft.arcfacedemo.utils.Data;
 import com.arcsoft.arcfacedemo.utils.LayoutUtil;
-import com.arcsoft.arcfacedemo.utils.Storage;
+import com.arcsoft.arcfacedemo.utils.StorageUser;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginSuccess(UserBean userBean) {
-        Storage.setUserInfo(this, userBean);
+        StorageUser.setUserInfo(this, userBean);
         Log.e("结果", userBean.getUserId() + "");
         Bundle bundle = this.getIntent().getExtras();
 

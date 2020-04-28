@@ -1,16 +1,18 @@
-package com.arcsoft.arcfacedemo.city;
+package com.arcsoft.arcfacedemo.films;
 
 import android.view.View;
+
+import com.arcsoft.arcfacedemo.databinding.ItemCinemaDetailBinding;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class CityViewHolder<T extends ViewDataBinding> extends RecyclerView.ViewHolder {
+public class CinemaViewHolder<T extends ViewDataBinding> extends RecyclerView.ViewHolder {
 
     private T binding;
 
-    public CityViewHolder(@NonNull T binding) {
+    public CinemaViewHolder(@NonNull T binding) {
         super(binding.getRoot());
         this.binding = binding;
     }
